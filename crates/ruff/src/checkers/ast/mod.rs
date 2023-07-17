@@ -635,6 +635,7 @@ where
                     type_params: _,
                     decorator_list,
                     body,
+                    type_params: _,
                     range: _,
                 },
             ) => {

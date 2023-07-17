@@ -172,6 +172,7 @@ fn create_class_def_stmt(typename: &str, body: Vec<Stmt>, base_class: &Expr) -> 
         body,
         type_params: vec![],
         decorator_list: vec![],
+        type_params: vec![],
         range: TextRange::default(),
     }
     .into()

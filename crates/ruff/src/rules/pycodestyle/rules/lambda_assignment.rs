@@ -226,6 +226,7 @@ fn function(
                 returns: Some(Box::new(return_type)),
                 type_params: vec![],
                 type_comment: None,
+                type_params: vec![],
                 range: TextRange::default(),
             });
             return generator.stmt(&func);
@@ -239,6 +240,7 @@ fn function(
         returns: None,
         type_params: vec![],
         type_comment: None,
+        type_params: vec![],
         range: TextRange::default(),
     });
     generator.stmt(&func)
