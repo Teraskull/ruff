@@ -675,7 +675,7 @@ impl<'stmt> BasicBlocksBuilder<'stmt> {
                 }
                 // The tough branches are done, here is an easy one.
                 Stmt::Return(_) => NextBlock::Terminate,
-                Stmt::TypeAlias(_) => todo!(),
+                Stmt::TypeAlias(_) => self.unconditional_next_block(after),
             };
 
             // Include any statements in the block that don't divert the control flow.
@@ -920,8 +920,8 @@ fn needs_next_block(stmts: &[Stmt]) -> bool {
         | Stmt::Match(_)
         | Stmt::Try(_)
         | Stmt::TryStar(_)
-        | Stmt::Assert(_) => true,
-        Stmt::TypeAlias(_) => todo!(),
+        | Stmt::Assert(_)
+        | Stmt::TypeAlias(_) => true,
     }
 }
 
@@ -941,7 +941,8 @@ fn is_control_flow_stmt(stmt: &Stmt) -> bool {
         | Stmt::AugAssign(_)
         | Stmt::AnnAssign(_)
         | Stmt::Expr(_)
-        | Stmt::Pass(_) => false,
+        | Stmt::Pass(_)
+        | Stmt::TypeAlias(_) => false,
         Stmt::Return(_)
         | Stmt::For(_)
         | Stmt::AsyncFor(_)
@@ -956,7 +957,6 @@ fn is_control_flow_stmt(stmt: &Stmt) -> bool {
         | Stmt::Assert(_)
         | Stmt::Break(_)
         | Stmt::Continue(_) => true,
-        Stmt::TypeAlias(_) => todo!(),
     }
 }
 

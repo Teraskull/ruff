@@ -335,7 +335,6 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             range: _range,
         }) => visitor.visit_expr(value),
         Stmt::Pass(_) | Stmt::Break(_) | Stmt::Continue(_) => {}
-        Stmt::TypeAlias(_) => todo!(),
     }
 }
 

@@ -565,7 +565,6 @@ where
             range: _range,
         }) => any_over_expr(value, func),
         Stmt::Pass(_) | Stmt::Break(_) | Stmt::Continue(_) => false,
-        Stmt::TypeAlias(_) => todo!(),
     }
 }
 

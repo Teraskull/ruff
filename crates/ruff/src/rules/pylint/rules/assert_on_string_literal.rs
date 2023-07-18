@@ -28,7 +28,6 @@ enum Kind {
 pub struct AssertOnStringLiteral {
     kind: Kind,
 }
-
 impl Violation for AssertOnStringLiteral {
     #[derive_message_formats]
     fn message(&self) -> String {

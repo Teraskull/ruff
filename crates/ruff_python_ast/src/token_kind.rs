@@ -434,7 +434,6 @@ impl TokenKind {
             Tok::StartInteractive => TokenKind::StartInteractive,
             Tok::StartExpression => TokenKind::StartExpression,
             Tok::MagicCommand { .. } => todo!(),
-            Tok::Type => todo!(),
         }
     }
 }

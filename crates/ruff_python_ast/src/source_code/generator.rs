@@ -272,7 +272,6 @@ impl<'a> Generator<'a> {
                 keywords,
                 body,
                 decorator_list,
-                type_params: _,
                 range: _,
                 type_params: _,
             }) => {
@@ -537,7 +536,7 @@ impl<'a> Generator<'a> {
                 self.unparse_expr(name, precedence::MAX);
                 for type_param in type_params {
                     self.unparse_type_param(type_param);
-                    self.p(", ")
+                    self.p(", ");
                 }
                 self.p(" = ");
                 self.unparse_expr(value, precedence::MAX);
@@ -719,7 +718,6 @@ impl<'a> Generator<'a> {
                     self.p("continue");
                 });
             }
-            Stmt::TypeAlias(_) => todo!(),
         }
     }
 

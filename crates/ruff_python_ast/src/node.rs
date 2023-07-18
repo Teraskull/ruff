@@ -2973,7 +2973,6 @@ impl From<Stmt> for AnyNode {
             Stmt::Pass(node) => AnyNode::StmtPass(node),
             Stmt::Break(node) => AnyNode::StmtBreak(node),
             Stmt::Continue(node) => AnyNode::StmtContinue(node),
-            Stmt::TypeAlias(_) => todo!(),
         }
     }
 }
@@ -4850,7 +4849,6 @@ impl<'a> From<&'a Stmt> for AnyNodeRef<'a> {
             Stmt::Pass(node) => AnyNodeRef::StmtPass(node),
             Stmt::Break(node) => AnyNodeRef::StmtBreak(node),
             Stmt::Continue(node) => AnyNodeRef::StmtContinue(node),
-            Stmt::TypeAlias(_) => todo!(),
         }
     }
 }

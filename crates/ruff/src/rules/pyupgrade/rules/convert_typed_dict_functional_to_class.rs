@@ -129,7 +129,6 @@ fn create_class_def_stmt(
         body,
         type_params: vec![],
         decorator_list: vec![],
-        type_params: vec![],
         range: TextRange::default(),
     }
     .into()
