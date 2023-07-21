@@ -39,6 +39,120 @@ impl ResolvedReference {
             ExecutionContext::Runtime
         }
     }
+
+    /// Return `true` if the context is in a type annotation.
+    pub const fn in_annotation(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::ANNOTATION)
+    }
+
+    /// Return `true` if the context is in a typing-only type annotation.
+    pub const fn in_typing_only_annotation(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::TYPING_ONLY_ANNOTATION)
+    }
+
+    /// Return `true` if the context is in a runtime-required type annotation.
+    pub const fn in_runtime_evaluated_annotation(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::RUNTIME_EVALUATED_ANNOTATION)
+    }
+
+    /// Return `true` if the context is in a type definition.
+    pub const fn in_type_definition(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::TYPE_DEFINITION)
+    }
+
+    /// Return `true` if the context is in a "simple" string type definition.
+    pub const fn in_simple_string_type_definition(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::SIMPLE_STRING_TYPE_DEFINITION)
+    }
+
+    /// Return `true` if the context is in a "complex" string type definition.
+    pub const fn in_complex_string_type_definition(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::COMPLEX_STRING_TYPE_DEFINITION)
+    }
+
+    /// Return `true` if the context is in a `__future__` type definition.
+    pub const fn in_future_type_definition(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::FUTURE_TYPE_DEFINITION)
+    }
+
+    /// Return `true` if the context is in any kind of deferred type definition.
+    pub const fn in_deferred_type_definition(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::DEFERRED_TYPE_DEFINITION)
+    }
+
+    /// Return `true` if the context is in a forward type reference.
+    ///
+    /// Includes deferred string types, and future types in annotations.
+    ///
+    /// ## Examples
+    /// ```python
+    /// from __future__ import annotations
+    ///
+    /// from threading import Thread
+    ///
+    ///
+    /// x: Thread  # Forward reference
+    /// cast("Thread", x)  # Forward reference
+    /// cast(Thread, x)  # Non-forward reference
+    /// ```
+    pub const fn in_forward_reference(&self) -> bool {
+        self.in_simple_string_type_definition()
+            || self.in_complex_string_type_definition()
+            || (self.in_future_type_definition() && self.in_typing_only_annotation())
+    }
+
+    /// Return `true` if the context is in an exception handler.
+    pub const fn in_exception_handler(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::EXCEPTION_HANDLER)
+    }
+
+    /// Return `true` if the context is in an f-string.
+    pub const fn in_f_string(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::F_STRING)
+    }
+
+    /// Return `true` if the context is in boolean test.
+    pub const fn in_boolean_test(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::BOOLEAN_TEST)
+    }
+
+    /// Return `true` if the context is in a `typing::Literal` annotation.
+    pub const fn in_literal(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::LITERAL)
+    }
+
+    /// Return `true` if the context is in a subscript expression.
+    pub const fn in_subscript(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::SUBSCRIPT)
+    }
+
+    /// Return `true` if the context is in a type-checking block.
+    pub const fn in_type_checking_block(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::TYPE_CHECKING_BLOCK)
+    }
+
+    /// Return `true` if the context has traversed past the "top-of-file" import boundary.
+    pub const fn seen_import_boundary(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::IMPORT_BOUNDARY)
+    }
+
+    /// Return `true` if the context has traverse past the `__future__` import boundary.
+    pub const fn seen_futures_boundary(&self) -> bool {
+        self.flags.intersects(SemanticModelFlags::FUTURES_BOUNDARY)
+    }
+
+    /// Return `true` if `__future__`-style type annotations are enabled.
+    pub const fn future_annotations(&self) -> bool {
+        self.flags
+            .intersects(SemanticModelFlags::FUTURE_ANNOTATIONS)
+    }
 }
 
 /// Id uniquely identifying a read reference in a program.
@@ -103,7 +217,7 @@ impl UnresolvedReference {
     /// Returns `true` if the unresolved reference may be resolved by a wildcard import.
     pub const fn is_wildcard_import(&self) -> bool {
         self.flags
-            .contains(UnresolvedReferenceFlags::WILDCARD_IMPORT)
+            .intersects(UnresolvedReferenceFlags::WILDCARD_IMPORT)
     }
 }
 
