@@ -2080,7 +2080,7 @@ dependencies = [
  "ruff_python_stdlib",
  "ruff_python_trivia",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "schemars",
  "semver",
@@ -2113,6 +2113,10 @@ dependencies = [
  "ruff_python_ast",
  "ruff_python_formatter",
  "ruff_python_parser",
+ "rustpython-ast",
+ "rustpython-format",
+ "rustpython-literal",
+ "rustpython-parser",
  "serde",
  "serde_json",
  "tikv-jemallocator",
@@ -2169,7 +2173,7 @@ dependencies = [
  "ruff_python_stdlib",
  "ruff_python_trivia",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "serde",
  "serde_json",
@@ -2226,7 +2230,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "log",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "serde",
 ]
 
@@ -2236,7 +2240,7 @@ version = "0.0.0"
 dependencies = [
  "drop_bomb",
  "insta",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "schemars",
  "serde",
@@ -2278,7 +2282,7 @@ dependencies = [
  "ruff_python_parser",
  "ruff_python_trivia",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "serde",
  "smallvec",
@@ -2313,7 +2317,7 @@ dependencies = [
  "ruff_python_parser",
  "ruff_python_trivia",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "serde",
  "serde_json",
@@ -2331,7 +2335,7 @@ dependencies = [
  "ruff_python_parser",
  "ruff_python_trivia",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
 ]
 
 [[package]]
@@ -2362,7 +2366,7 @@ dependencies = [
  "num-bigint",
  "num-traits",
  "ruff_python_ast",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "static_assertions",
  "tiny-keccak",
@@ -2392,7 +2396,7 @@ dependencies = [
  "ruff_python_ast",
  "ruff_python_stdlib",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "rustc-hash",
  "smallvec",
 ]
@@ -2410,7 +2414,7 @@ dependencies = [
  "ruff_python_ast",
  "ruff_python_parser",
  "ruff_source_file",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "smallvec",
  "unic-ucd-ident",
 ]
@@ -2425,7 +2429,7 @@ dependencies = [
  "regex",
  "ruff_python_ast",
  "ruff_python_parser",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "shlex",
  "tracing",
  "tracing-subscriber",
@@ -2438,7 +2442,7 @@ dependencies = [
  "insta",
  "memchr",
  "once_cell",
- "ruff_text_size",
+ "ruff_text_size 0.0.0",
  "serde",
 ]
 
@@ -2451,6 +2455,11 @@ dependencies = [
  "serde_test",
  "static_assertions",
 ]
+
+[[package]]
+name = "ruff_text_size"
+version = "0.0.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
 
 [[package]]
 name = "ruff_wasm"
@@ -2537,6 +2546,74 @@ checksum = "d6207cd5ed3d8dca7816f8f3725513a34609c0c765bf652b8c3cb4cfd87db46b"
 dependencies = [
  "ring",
  "untrusted",
+]
+
+[[package]]
+name = "rustpython-ast"
+version = "0.2.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
+dependencies = [
+ "is-macro",
+ "num-bigint",
+ "rustpython-parser-core",
+ "static_assertions",
+]
+
+[[package]]
+name = "rustpython-format"
+version = "0.2.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
+dependencies = [
+ "bitflags 2.3.3",
+ "itertools",
+ "num-bigint",
+ "num-traits",
+ "rustpython-literal",
+]
+
+[[package]]
+name = "rustpython-literal"
+version = "0.2.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
+dependencies = [
+ "hexf-parse",
+ "is-macro",
+ "lexical-parse-float",
+ "num-traits",
+ "unic-ucd-category",
+]
+
+[[package]]
+name = "rustpython-parser"
+version = "0.2.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
+dependencies = [
+ "anyhow",
+ "is-macro",
+ "itertools",
+ "lalrpop-util",
+ "log",
+ "num-bigint",
+ "num-traits",
+ "phf",
+ "phf_codegen",
+ "rustc-hash",
+ "rustpython-ast",
+ "rustpython-parser-core",
+ "tiny-keccak",
+ "unic-emoji-char",
+ "unic-ucd-ident",
+ "unicode_names2",
+]
+
+[[package]]
+name = "rustpython-parser-core"
+version = "0.2.0"
+source = "git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779#4d03b9b5b212fc869e4cfda151414438186a7779"
+dependencies = [
+ "is-macro",
+ "memchr",
+ "ruff_text_size 0.0.0 (git+https://github.com/astral-sh/RustPython-Parser.git?rev=4d03b9b5b212fc869e4cfda151414438186a7779)",
 ]
 
 [[package]]
