@@ -268,13 +268,45 @@ fn handle_own_line_comment_after_body<'a>(
     // Check if we're between bodies and should attach to the following body. If that is not the
     // case, either because there is no following branch or because the indentation is too deep,
     // attach to the recursively last statement in the preceding body with the matching indentation.
-    match handle_own_line_comment_between_branches(comment, preceding, locator) {
+    let comment = match handle_own_line_comment_between_branches(comment, preceding, locator) {
         CommentPlacement::Default(comment) => {
             // Knowing the comment is not between branches, handle comments after the last branch
-            handle_own_line_comment_after_branch(comment, preceding, locator)
+            comment
         }
-        placement => placement,
+        placement => return placement,
+    };
+    let comment = match handle_own_line_comment_after_branch(comment, preceding, locator) {
+        CommentPlacement::Default(comment) => {
+            // Knowing the comment is not between branches, handle comments after the last branch
+            comment
+        }
+        placement => return placement,
+    };
+
+    // ```python
+    // if (
+    //    a
+    //    # attach trailing to a
+    //):
+    //    pass
+    // ```
+    if let Some(following) = comment.following_node() {
+        if is_first_statement_in_body(following, comment.enclosing_node())
+            && SimpleTokenizer::new(
+                locator.contents(),
+                TextRange::new(comment.end(), following.start()),
+            )
+            .skip_trivia()
+            .next()
+            .is_some()
+        {
+            if let Some(preceding) = comment.preceding_node() {
+                return CommentPlacement::trailing(preceding, comment);
+            }
+        }
     }
+
+    CommentPlacement::Default(comment)
 }
 
 /// Handles own line comments between two branches of a node.
