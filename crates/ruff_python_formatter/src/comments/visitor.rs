@@ -23,7 +23,7 @@ use crate::comments::{CommentLinePosition, CommentsMap, SourceComment};
 
 /// Visitor extracting the comments from an AST.
 #[derive(Debug)]
-pub(crate) struct CommentsVisitor<'a, 'b, Collector>
+pub(super) struct CommentsVisitor<'a, 'b, Collector>
 where
     Collector: CommentsCollector<'a>,
 {
@@ -38,7 +38,7 @@ impl<'a, 'b, Collector> CommentsVisitor<'a, 'b, Collector>
 where
     Collector: CommentsCollector<'a>,
 {
-    pub(crate) fn new(
+    pub(super) fn new(
         source_code: SourceCode<'a>,
         comment_ranges: &'a CommentRanges,
         collector: &'b mut Collector,
@@ -501,7 +501,7 @@ impl From<DecoratedComment<'_>> for SourceComment {
 }
 
 #[derive(Debug)]
-pub(crate) enum CommentPlacement<'a> {
+pub(super) enum CommentPlacement<'a> {
     /// Makes `comment` a [leading comment](self#leading-comments) of `node`.
     Leading {
         node: AnyNodeRef<'a>,
@@ -686,12 +686,12 @@ impl TraversalSignal {
     }
 }
 
-pub(crate) trait CommentsCollector<'a>: Default {
+pub(super) trait CommentsCollector<'a>: Default {
     fn add_comment(&mut self, placement: DecoratedComment<'a>, locator: &Locator);
 }
 
 #[derive(Clone, Debug, Default)]
-pub(crate) struct CommentsBuilder<'a> {
+pub(super) struct CommentsBuilder<'a> {
     comments: CommentsMap<'a>,
 }
 
@@ -781,7 +781,7 @@ impl<'a> CommentsBuilder<'a> {
 
 /// Used for the debug output, collects preceding, following and enclosing
 #[derive(Default)]
-pub(crate) struct DecoratedCommentsCollector<'a> {
+pub(super) struct DecoratedCommentsCollector<'a> {
     comments: Vec<DecoratedComment<'a>>,
 }
 
@@ -792,7 +792,7 @@ impl<'a> CommentsCollector<'a> for DecoratedCommentsCollector<'a> {
 }
 
 impl<'a> DecoratedCommentsCollector<'a> {
-    pub(crate) fn finish(self) -> Vec<DecoratedComment<'a>> {
+    pub(super) fn finish(self) -> Vec<DecoratedComment<'a>> {
         self.comments
     }
 }

@@ -273,7 +273,7 @@ impl<'a> Comments<'a> {
     }
 
     /// Extracts the comments from the AST.
-    pub(crate) fn collect_decorated_comments(
+    pub(super) fn collect_decorated_comments(
         root: &'a Mod,
         source_code: SourceCode<'a>,
         comment_ranges: &'a CommentRanges,
