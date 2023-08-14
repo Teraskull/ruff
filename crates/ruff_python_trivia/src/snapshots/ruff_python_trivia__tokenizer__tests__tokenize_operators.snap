@@ -4,24 +4,16 @@ expression: test_case.tokens()
 ---
 [
     SimpleToken {
-        kind: Minus,
-        range: 0..1,
-    },
-    SimpleToken {
-        kind: Greater,
-        range: 1..2,
+        kind: RArrow,
+        range: 0..2,
     },
     SimpleToken {
         kind: Whitespace,
         range: 2..3,
     },
     SimpleToken {
-        kind: Star,
-        range: 3..4,
-    },
-    SimpleToken {
-        kind: Equals,
-        range: 4..5,
+        kind: StarEqual,
+        range: 3..5,
     },
     SimpleToken {
         kind: Whitespace,
@@ -32,15 +24,27 @@ expression: test_case.tokens()
         range: 6..7,
     },
     SimpleToken {
-        kind: Tilde,
+        kind: Whitespace,
         range: 7..8,
     },
     SimpleToken {
-        kind: Equals,
-        range: 8..9,
+        kind: MinusEqual,
+        range: 8..10,
+    },
+    SimpleToken {
+        kind: Whitespace,
+        range: 10..11,
     },
     SimpleToken {
         kind: RParen,
-        range: 9..10,
+        range: 11..12,
+    },
+    SimpleToken {
+        kind: Whitespace,
+        range: 12..13,
+    },
+    SimpleToken {
+        kind: Tilde,
+        range: 13..14,
     },
 ]
