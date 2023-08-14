@@ -181,9 +181,7 @@ impl Format<PyFormatContext<'_>> for NotYetImplemented<'_> {
             },
         )))?;
 
-        f.write_element(FormatElement::DynamicText {
-            text: Box::from(text),
-        })?;
+        dynamic_text(&text, None).fmt(f)?;
 
         f.write_element(FormatElement::Tag(Tag::EndVerbatim))?;
 
