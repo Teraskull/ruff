@@ -11,6 +11,7 @@ pub mod identifier;
 pub mod imports;
 pub mod node;
 mod nodes;
+pub mod parenthesize;
 pub mod relocate;
 pub mod statement_visitor;
 pub mod stmt_if;

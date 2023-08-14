@@ -1,8 +1,7 @@
 use ruff_formatter::prelude::tag::Condition;
 use ruff_formatter::{format_args, write, Argument, Arguments};
 use ruff_python_ast::node::AnyNodeRef;
-use ruff_python_ast::Ranged;
-use ruff_python_trivia::{first_non_trivia_token, SimpleToken, SimpleTokenKind, SimpleTokenizer};
+use ruff_python_ast::parenthesize::ParenthesizedExpression;
 
 use crate::comments::{
     dangling_comments, dangling_open_parenthesis_comments, trailing_comments, SourceComment,
@@ -81,27 +80,7 @@ pub enum Parentheses {
 }
 
 pub(crate) fn is_expression_parenthesized(expr: AnyNodeRef, contents: &str) -> bool {
-    // First test if there's a closing parentheses because it tends to be cheaper.
-    if matches!(
-        first_non_trivia_token(expr.end(), contents),
-        Some(SimpleToken {
-            kind: SimpleTokenKind::RParen,
-            ..
-        })
-    ) {
-        let mut tokenizer =
-            SimpleTokenizer::up_to_without_back_comment(expr.start(), contents).skip_trivia();
-
-        matches!(
-            tokenizer.next_back(),
-            Some(SimpleToken {
-                kind: SimpleTokenKind::LParen,
-                ..
-            })
-        )
-    } else {
-        false
-    }
+    ParenthesizedExpression::from_expr(expr, contents).is_parenthesized()
 }
 
 /// Formats `content` enclosed by the `left` and `right` parentheses. The implementation also ensures

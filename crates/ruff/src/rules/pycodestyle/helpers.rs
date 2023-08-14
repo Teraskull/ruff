@@ -1,8 +1,9 @@
-use ruff_python_ast::{CmpOp, Expr, Ranged};
-use ruff_text_size::{TextLen, TextRange};
 use unicode_width::UnicodeWidthStr;
 
+use ruff_python_ast::parenthesize::ParenthesizedExpression;
+use ruff_python_ast::{CmpOp, Expr, Ranged};
 use ruff_source_file::{Line, Locator};
+use ruff_text_size::{TextLen, TextRange};
 
 use crate::line_width::{LineLength, LineWidth, TabSize};
 
@@ -21,7 +22,9 @@ pub(super) fn compare(
     let mut contents = String::with_capacity(usize::from(end - start));
 
     // Add the left side of the comparison.
-    contents.push_str(locator.slice(left.range()));
+    contents.push_str(
+        locator.slice(ParenthesizedExpression::from_expr(left.into(), locator.contents()).range()),
+    );
 
     for (op, comparator) in ops.iter().zip(comparators) {
         // Add the operator.
@@ -39,7 +42,9 @@ pub(super) fn compare(
         });
 
         // Add the right side of the comparison.
-        contents.push_str(locator.slice(comparator.range()));
+        contents.push_str(locator.slice(
+            ParenthesizedExpression::from_expr(comparator.into(), locator.contents()).range(),
+        ));
     }
 
     contents
