@@ -6,6 +6,7 @@ use smallvec::smallvec;
 
 use ruff_python_ast::call_path::{collect_call_path, from_unqualified_name, CallPath};
 use ruff_python_ast::helpers::from_relative_import;
+use ruff_python_ast::node::{AnyNodeRef, AnyStatementRef};
 use ruff_python_ast::{self as ast, Expr, Operator, Ranged, Stmt};
 use ruff_python_stdlib::path::is_python_stub_file;
 use ruff_python_stdlib::typing::is_typing_extension;
@@ -19,6 +20,7 @@ use crate::context::ExecutionContext;
 use crate::definition::{Definition, DefinitionId, Definitions, Member, Module};
 use crate::expressions::{ExpressionId, Expressions};
 use crate::globals::{Globals, GlobalsArena};
+use crate::nodes::{NodeId, Nodes};
 use crate::reference::{
     ResolvedReference, ResolvedReferenceId, ResolvedReferences, UnresolvedReference,
     UnresolvedReferenceFlags, UnresolvedReferences,
@@ -43,6 +45,9 @@ pub struct SemanticModel<'a> {
 
     /// The identifier of the current expression.
     expression_id: Option<ExpressionId>,
+
+    nodes: Nodes<'a>,
+    node_id: Option<NodeId>,
 
     /// Stack of all scopes, along with the identifier of the current scope.
     pub scopes: Scopes<'a>,
@@ -138,6 +143,8 @@ impl<'a> SemanticModel<'a> {
             statement_id: None,
             expressions: Expressions::default(),
             expression_id: None,
+            nodes: Nodes::default(),
+            node_id: None,
             scopes: Scopes::default(),
             scope_id: ScopeId::global(),
             definitions: Definitions::for_module(module),
@@ -779,6 +786,17 @@ impl<'a> SemanticModel<'a> {
             })
     }
 
+    /// Push an AST node [`AnyNodeRef`] onto the stack.
+    pub fn push_node(&mut self, node: AnyNodeRef<'a>) {
+        self.node_id = Some(self.nodes.insert(node, self.node_id));
+    }
+
+    /// Pop the current AST node [`AnyNodeRef`] off the stack.
+    pub fn pop_node(&mut self) {
+        let node_id = self.node_id.expect("Attempted to pop without node");
+        self.node_id = self.nodes.parent_id(node_id);
+    }
+
     /// Push a [`Stmt`] onto the stack.
     pub fn push_statement(&mut self, stmt: &'a Stmt) {
         self.statement_id = Some(self.statements.insert(stmt, self.statement_id));
@@ -829,6 +847,15 @@ impl<'a> SemanticModel<'a> {
             panic!("Attempted to pop without member definition");
         };
         self.definition_id = member.parent;
+    }
+
+    /// Return the current `Stmt`.
+    pub fn current_statement_ref(&self) -> AnyStatementRef<'a> {
+        let id = self.node_id.expect("No current node");
+        self.nodes
+            .ancestor_ids(id)
+            .find_map(|node_id| self.nodes[node_id].statement())
+            .expect("No current statement")
     }
 
     /// Return the current `Stmt`.
@@ -1133,6 +1160,7 @@ impl<'a> SemanticModel<'a> {
     pub fn snapshot(&self) -> Snapshot {
         Snapshot {
             scope_id: self.scope_id,
+            node_id: self.node_id,
             stmt_id: self.statement_id,
             expr_id: self.expression_id,
             definition_id: self.definition_id,
@@ -1144,12 +1172,14 @@ impl<'a> SemanticModel<'a> {
     pub fn restore(&mut self, snapshot: Snapshot) {
         let Snapshot {
             scope_id,
+            node_id,
             stmt_id,
             expr_id,
             definition_id,
             flags,
         } = snapshot;
         self.scope_id = scope_id;
+        self.node_id = node_id;
         self.statement_id = stmt_id;
         self.expression_id = expr_id;
         self.definition_id = definition_id;
@@ -1564,6 +1594,7 @@ impl SemanticModelFlags {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Snapshot {
     scope_id: ScopeId,
+    node_id: Option<NodeId>,
     stmt_id: Option<StatementId>,
     expr_id: Option<ExpressionId>,
     definition_id: DefinitionId,

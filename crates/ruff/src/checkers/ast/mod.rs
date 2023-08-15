@@ -43,6 +43,7 @@ use ruff_python_ast::helpers::{
     collect_import_from_member, extract_handled_exceptions, to_module_path,
 };
 use ruff_python_ast::identifier::Identifier;
+use ruff_python_ast::node::{AnyNodeRef, AnyStatementRef};
 use ruff_python_ast::str::trailing_quote;
 use ruff_python_ast::visitor::{walk_except_handler, walk_pattern, Visitor};
 use ruff_python_ast::{helpers, str, visitor, PySourceType};
@@ -264,6 +265,7 @@ where
     fn visit_stmt(&mut self, stmt: &'b Stmt) {
         // Step 0: Pre-processing
         self.semantic.push_statement(stmt);
+        self.semantic.push_node(AnyNodeRef::from(stmt));
 
         // Track whether we've seen docstrings, non-imports, etc.
         match stmt {
@@ -759,6 +761,7 @@ where
         analyze::statement(stmt, self);
 
         self.semantic.flags = flags_snapshot;
+        self.semantic.pop_node();
         self.semantic.pop_statement();
     }
 
@@ -796,6 +799,7 @@ where
         }
 
         self.semantic.push_expression(expr);
+        self.semantic.push_node(AnyNodeRef::from(expr));
 
         // Store the flags prior to any further descent, so that we can restore them after visiting
         // the node.
@@ -1213,6 +1217,7 @@ where
         analyze::expression(expr, self);
 
         self.semantic.flags = flags_snapshot;
+        self.semantic.pop_node();
         self.semantic.pop_expression();
     }
 
@@ -1807,9 +1812,11 @@ impl<'a> Checker<'a> {
             for snapshot in deferred_functions {
                 self.semantic.restore(snapshot);
 
-                if let Stmt::FunctionDef(ast::StmtFunctionDef {
-                    body, parameters, ..
-                }) = self.semantic.current_statement()
+                if let AnyStatementRef::StmtFunctionDef(ast::StmtFunctionDef {
+                    body,
+                    parameters,
+                    ..
+                }) = self.semantic.current_statement_ref()
                 {
                     self.visit_parameters(parameters);
                     self.visit_body(body);

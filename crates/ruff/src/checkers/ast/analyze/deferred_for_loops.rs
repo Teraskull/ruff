@@ -1,3 +1,4 @@
+use ruff_python_ast::node::AnyStatementRef;
 use ruff_python_ast::{self as ast, Stmt};
 
 use crate::checkers::ast::Checker;
@@ -11,9 +12,9 @@ pub(crate) fn deferred_for_loops(checker: &mut Checker) {
         for snapshot in for_loops {
             checker.semantic.restore(snapshot);
 
-            let Stmt::For(ast::StmtFor {
+            let AnyStatementRef::StmtFor(ast::StmtFor {
                 target, iter, body, ..
-            }) = checker.semantic.current_statement()
+            }) = checker.semantic.current_statement_ref()
             else {
                 unreachable!("Expected Stmt::For");
             };

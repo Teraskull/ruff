@@ -4715,7 +4715,7 @@ pub enum AnyNodeRef<'a> {
     ElifElseClause(&'a ast::ElifElseClause),
 }
 
-impl AnyNodeRef<'_> {
+impl<'a> AnyNodeRef<'a> {
     pub fn as_ptr(&self) -> NonNull<()> {
         match self {
             AnyNodeRef::ModModule(node) => NonNull::from(*node).cast(),
@@ -4887,6 +4887,93 @@ impl AnyNodeRef<'_> {
             AnyNodeRef::TypeParamTypeVarTuple(_) => NodeKind::TypeParamTypeVarTuple,
             AnyNodeRef::TypeParamParamSpec(_) => NodeKind::TypeParamParamSpec,
             AnyNodeRef::ElifElseClause(_) => NodeKind::ElifElseClause,
+        }
+    }
+
+    pub fn statement(self) -> Option<AnyStatementRef<'a>> {
+        match self {
+            AnyNodeRef::StmtFunctionDef(node) => Some(AnyStatementRef::StmtFunctionDef(node)),
+            AnyNodeRef::StmtClassDef(node) => Some(AnyStatementRef::StmtClassDef(node)),
+            AnyNodeRef::StmtReturn(node) => Some(AnyStatementRef::StmtReturn(node)),
+            AnyNodeRef::StmtDelete(node) => Some(AnyStatementRef::StmtDelete(node)),
+            AnyNodeRef::StmtTypeAlias(node) => Some(AnyStatementRef::StmtTypeAlias(node)),
+            AnyNodeRef::StmtAssign(node) => Some(AnyStatementRef::StmtAssign(node)),
+            AnyNodeRef::StmtAugAssign(node) => Some(AnyStatementRef::StmtAugAssign(node)),
+            AnyNodeRef::StmtAnnAssign(node) => Some(AnyStatementRef::StmtAnnAssign(node)),
+            AnyNodeRef::StmtFor(node) => Some(AnyStatementRef::StmtFor(node)),
+            AnyNodeRef::StmtWhile(node) => Some(AnyStatementRef::StmtWhile(node)),
+            AnyNodeRef::StmtIf(node) => Some(AnyStatementRef::StmtIf(node)),
+            AnyNodeRef::StmtWith(node) => Some(AnyStatementRef::StmtWith(node)),
+            AnyNodeRef::StmtMatch(node) => Some(AnyStatementRef::StmtMatch(node)),
+            AnyNodeRef::StmtRaise(node) => Some(AnyStatementRef::StmtRaise(node)),
+            AnyNodeRef::StmtTry(node) => Some(AnyStatementRef::StmtTry(node)),
+            AnyNodeRef::StmtAssert(node) => Some(AnyStatementRef::StmtAssert(node)),
+            AnyNodeRef::StmtImport(node) => Some(AnyStatementRef::StmtImport(node)),
+            AnyNodeRef::StmtImportFrom(node) => Some(AnyStatementRef::StmtImportFrom(node)),
+            AnyNodeRef::StmtGlobal(node) => Some(AnyStatementRef::StmtGlobal(node)),
+            AnyNodeRef::StmtNonlocal(node) => Some(AnyStatementRef::StmtNonlocal(node)),
+            AnyNodeRef::StmtExpr(node) => Some(AnyStatementRef::StmtExpr(node)),
+            AnyNodeRef::StmtPass(node) => Some(AnyStatementRef::StmtPass(node)),
+            AnyNodeRef::StmtBreak(node) => Some(AnyStatementRef::StmtBreak(node)),
+            AnyNodeRef::StmtContinue(node) => Some(AnyStatementRef::StmtContinue(node)),
+            AnyNodeRef::StmtIpyEscapeCommand(node) => {
+                Some(AnyStatementRef::StmtIpyEscapeCommand(node))
+            }
+
+            AnyNodeRef::ModModule(_)
+            | AnyNodeRef::ModExpression(_)
+            | AnyNodeRef::ExprBoolOp(_)
+            | AnyNodeRef::ExprNamedExpr(_)
+            | AnyNodeRef::ExprBinOp(_)
+            | AnyNodeRef::ExprUnaryOp(_)
+            | AnyNodeRef::ExprLambda(_)
+            | AnyNodeRef::ExprIfExp(_)
+            | AnyNodeRef::ExprDict(_)
+            | AnyNodeRef::ExprSet(_)
+            | AnyNodeRef::ExprListComp(_)
+            | AnyNodeRef::ExprSetComp(_)
+            | AnyNodeRef::ExprDictComp(_)
+            | AnyNodeRef::ExprGeneratorExp(_)
+            | AnyNodeRef::ExprAwait(_)
+            | AnyNodeRef::ExprYield(_)
+            | AnyNodeRef::ExprYieldFrom(_)
+            | AnyNodeRef::ExprCompare(_)
+            | AnyNodeRef::ExprCall(_)
+            | AnyNodeRef::ExprFormattedValue(_)
+            | AnyNodeRef::ExprFString(_)
+            | AnyNodeRef::ExprConstant(_)
+            | AnyNodeRef::ExprAttribute(_)
+            | AnyNodeRef::ExprSubscript(_)
+            | AnyNodeRef::ExprStarred(_)
+            | AnyNodeRef::ExprName(_)
+            | AnyNodeRef::ExprList(_)
+            | AnyNodeRef::ExprTuple(_)
+            | AnyNodeRef::ExprSlice(_)
+            | AnyNodeRef::ExprIpyEscapeCommand(_)
+            | AnyNodeRef::ExceptHandlerExceptHandler(_)
+            | AnyNodeRef::PatternMatchValue(_)
+            | AnyNodeRef::PatternMatchSingleton(_)
+            | AnyNodeRef::PatternMatchSequence(_)
+            | AnyNodeRef::PatternMatchMapping(_)
+            | AnyNodeRef::PatternMatchClass(_)
+            | AnyNodeRef::PatternMatchStar(_)
+            | AnyNodeRef::PatternMatchAs(_)
+            | AnyNodeRef::PatternMatchOr(_)
+            | AnyNodeRef::Comprehension(_)
+            | AnyNodeRef::Arguments(_)
+            | AnyNodeRef::Parameters(_)
+            | AnyNodeRef::Parameter(_)
+            | AnyNodeRef::ParameterWithDefault(_)
+            | AnyNodeRef::Keyword(_)
+            | AnyNodeRef::Alias(_)
+            | AnyNodeRef::WithItem(_)
+            | AnyNodeRef::MatchCase(_)
+            | AnyNodeRef::Decorator(_)
+            | AnyNodeRef::TypeParams(_)
+            | AnyNodeRef::TypeParamTypeVar(_)
+            | AnyNodeRef::TypeParamTypeVarTuple(_)
+            | AnyNodeRef::TypeParamParamSpec(_)
+            | AnyNodeRef::ElifElseClause(_) => None,
         }
     }
 
@@ -5340,7 +5427,7 @@ impl AnyNodeRef<'_> {
         )
     }
 
-    pub fn visit_preorder<'a, V>(&'a self, visitor: &mut V)
+    pub fn visit_preorder<V>(&'a self, visitor: &mut V)
     where
         V: PreorderVisitor<'a> + ?Sized,
     {
@@ -6174,4 +6261,65 @@ pub enum NodeKind {
     TypeParamTypeVar,
     TypeParamTypeVarTuple,
     TypeParamParamSpec,
+}
+
+#[derive(Copy, Clone, Debug, is_macro::Is, PartialEq)]
+pub enum AnyStatementRef<'a> {
+    StmtFunctionDef(&'a ast::StmtFunctionDef),
+    StmtClassDef(&'a ast::StmtClassDef),
+    StmtReturn(&'a ast::StmtReturn),
+    StmtDelete(&'a ast::StmtDelete),
+    StmtTypeAlias(&'a ast::StmtTypeAlias),
+    StmtAssign(&'a ast::StmtAssign),
+    StmtAugAssign(&'a ast::StmtAugAssign),
+    StmtAnnAssign(&'a ast::StmtAnnAssign),
+    StmtFor(&'a ast::StmtFor),
+    StmtWhile(&'a ast::StmtWhile),
+    StmtIf(&'a ast::StmtIf),
+    StmtWith(&'a ast::StmtWith),
+    StmtMatch(&'a ast::StmtMatch),
+    StmtRaise(&'a ast::StmtRaise),
+    StmtTry(&'a ast::StmtTry),
+    StmtAssert(&'a ast::StmtAssert),
+    StmtImport(&'a ast::StmtImport),
+    StmtImportFrom(&'a ast::StmtImportFrom),
+    StmtGlobal(&'a ast::StmtGlobal),
+    StmtNonlocal(&'a ast::StmtNonlocal),
+    StmtExpr(&'a ast::StmtExpr),
+    StmtPass(&'a ast::StmtPass),
+    StmtBreak(&'a ast::StmtBreak),
+    StmtContinue(&'a ast::StmtContinue),
+    StmtIpyEscapeCommand(&'a ast::StmtIpyEscapeCommand),
+}
+
+impl<'a> From<&'a Stmt> for AnyStatementRef<'a> {
+    fn from(node: &'a Stmt) -> Self {
+        match node {
+            Stmt::FunctionDef(node) => AnyStatementRef::StmtFunctionDef(node),
+            Stmt::ClassDef(node) => AnyStatementRef::StmtClassDef(node),
+            Stmt::Return(node) => AnyStatementRef::StmtReturn(node),
+            Stmt::Delete(node) => AnyStatementRef::StmtDelete(node),
+            Stmt::TypeAlias(node) => AnyStatementRef::StmtTypeAlias(node),
+            Stmt::Assign(node) => AnyStatementRef::StmtAssign(node),
+            Stmt::AugAssign(node) => AnyStatementRef::StmtAugAssign(node),
+            Stmt::AnnAssign(node) => AnyStatementRef::StmtAnnAssign(node),
+            Stmt::For(node) => AnyStatementRef::StmtFor(node),
+            Stmt::While(node) => AnyStatementRef::StmtWhile(node),
+            Stmt::If(node) => AnyStatementRef::StmtIf(node),
+            Stmt::With(node) => AnyStatementRef::StmtWith(node),
+            Stmt::Match(node) => AnyStatementRef::StmtMatch(node),
+            Stmt::Raise(node) => AnyStatementRef::StmtRaise(node),
+            Stmt::Try(node) => AnyStatementRef::StmtTry(node),
+            Stmt::Assert(node) => AnyStatementRef::StmtAssert(node),
+            Stmt::Import(node) => AnyStatementRef::StmtImport(node),
+            Stmt::ImportFrom(node) => AnyStatementRef::StmtImportFrom(node),
+            Stmt::Global(node) => AnyStatementRef::StmtGlobal(node),
+            Stmt::Nonlocal(node) => AnyStatementRef::StmtNonlocal(node),
+            Stmt::Expr(node) => AnyStatementRef::StmtExpr(node),
+            Stmt::Pass(node) => AnyStatementRef::StmtPass(node),
+            Stmt::Break(node) => AnyStatementRef::StmtBreak(node),
+            Stmt::Continue(node) => AnyStatementRef::StmtContinue(node),
+            Stmt::IpyEscapeCommand(node) => AnyStatementRef::StmtIpyEscapeCommand(node),
+        }
+    }
 }
