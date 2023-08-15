@@ -1,11 +1,14 @@
 use ruff_formatter::{format_args, write};
 use ruff_python_ast::StmtMatch;
 
-use crate::comments::{leading_alternate_branch_comments, trailing_comments, SourceComment};
+use crate::comments::{
+    leading_alternate_branch_comments, trailing_comments, SourceComment, SuppressionKind,
+};
 use crate::context::{NodeLevel, WithNodeLevel};
 use crate::expression::maybe_parenthesize_expression;
 use crate::expression::parentheses::Parenthesize;
 use crate::prelude::*;
+use crate::verbatim::SuppressedClauseHeader;
 use crate::FormatNodeRule;
 
 #[derive(Default)]
@@ -25,16 +28,21 @@ impl FormatNodeRule<StmtMatch> for FormatStmtMatch {
         // There can be at most one dangling comment after the colon in a match statement.
         debug_assert!(dangling_item_comments.len() <= 1);
 
-        write!(
-            f,
-            [
-                text("match"),
-                space(),
-                maybe_parenthesize_expression(subject, item, Parenthesize::IfBreaks),
-                text(":"),
-                trailing_comments(dangling_item_comments)
-            ]
-        )?;
+        if SuppressionKind::has_skip_comment(dangling_item_comments, f.context().source()) {
+            SuppressedClauseHeader::Match(item).fmt(f)?;
+        } else {
+            write!(
+                f,
+                [
+                    text("match"),
+                    space(),
+                    maybe_parenthesize_expression(subject, item, Parenthesize::IfBreaks),
+                    text(":"),
+                ]
+            )?;
+        }
+
+        trailing_comments(dangling_item_comments).fmt(f)?;
 
         let mut cases_iter = cases.iter();
         let Some(first) = cases_iter.next() else {
@@ -51,11 +59,11 @@ impl FormatNodeRule<StmtMatch> for FormatStmtMatch {
             write!(
                 f,
                 [block_indent(&format_args!(
-                    &leading_alternate_branch_comments(
+                    leading_alternate_branch_comments(
                         comments.leading_comments(case),
                         last_case.body.last(),
                     ),
-                    &case.format()
+                    case.format()
                 ))]
             )?;
             last_case = case;
